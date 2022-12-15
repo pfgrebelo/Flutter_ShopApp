@@ -11,7 +11,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider(  //.value(...INSTEAD OF CONSTRUCTOR, CREATE(ctx)=>Products(), CAN USE VALUE IN CASE OF SINGLE ITEM OF GRIDS OR LISTS
+      //value: Products(),
       create: (context) => Products(),    //WIDGET FROM PROVIDER PACKAGE
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
