@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
+import '../providers/product.dart';
 
 class ProductItem extends StatelessWidget {
-  final String id;
+  /* final String id;
   final String title;
   final String imageUrl;
   final double price;
@@ -13,41 +15,43 @@ class ProductItem extends StatelessWidget {
       required this.id,
       required this.title,
       required this.imageUrl,
-      required this.price});
+      required this.price}); */
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
+    final product = Provider.of<Product>(context);  //GETS THE SPECIFIC PRODUCT
+    return ClipRRect(       //CHANGES BORDER OF IT'S CHILD
       borderRadius: BorderRadius.circular(15),
       child: GridTile(
-        child: GestureDetector(
+        child: GestureDetector(   //ADDS ONTAP TO IMAGE
           onTap: () {
             Navigator.of(context).pushNamed(
               ProductDetailScreen.routeName,
-              arguments: id,    //PASS ID AS ARGUMENT TO ACCESS DATA
+              arguments: product.id,    //PASS ID AS ARGUMENT TO ACCESS DATA
             );
           },
           child: Image.network(
-            imageUrl,
+            product.imageUrl,
             fit: BoxFit.cover,
           ),
         ),
         header: GridTileBar(
           backgroundColor: Colors.black87,
           title: Text(
-            title,
+            product.title,
             textAlign: TextAlign.start,
           ),
           trailing: IconButton(
-            icon: Icon(Icons.favorite),
-            onPressed: () {},
+            icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),  //CHECKS IF ISFAVORITE IS TOGGLED TO USE DIFERENT ICONS ON EACH CASES
+            onPressed: () {
+              product.toggleFavoriteStatus();   //USES FUNCTION FROM PRODUCT.PROVIDER
+            },
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black54,
-          title: Text(
-            '€$price',
+          title: Text('€${product.price}',
             textAlign: TextAlign.start,
           ),
           trailing: IconButton(
