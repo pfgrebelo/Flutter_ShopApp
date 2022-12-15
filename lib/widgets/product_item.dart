@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
+import '../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
   /* final String id;
@@ -20,6 +21,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //final product = Provider.of<Product>(context);  //GETS THE SPECIFIC PRODUCT
+    final cart = Provider.of<Cart>(context, listen: false);
     return Consumer<Product>(     //WIDGET CONSUMER TO REPLACE PROVIDER.OF
       builder: (context, product, child) => ClipRRect(       //CHANGES BORDER OF IT'S CHILD
         borderRadius: BorderRadius.circular(15),
@@ -37,7 +39,7 @@ class ProductItem extends StatelessWidget {
             ),
           ),
           header: GridTileBar(
-            backgroundColor: Colors.black87,
+            backgroundColor: Colors.black54,
             title: Text(
               product.title,
               textAlign: TextAlign.start,
@@ -51,13 +53,15 @@ class ProductItem extends StatelessWidget {
             ),
           ),
           footer: GridTileBar(
-            backgroundColor: Colors.black54,
+            backgroundColor: Colors.black87,
             title: Text('€${product.price}',
               textAlign: TextAlign.start,
             ),
             trailing: IconButton(
               icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
+              onPressed: () {
+                cart.addItem(product.id, product.price, product.title);
+              },
               color: Theme.of(context).colorScheme.secondary,
             ),
           ),
