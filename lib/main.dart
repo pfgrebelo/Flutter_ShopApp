@@ -32,11 +32,25 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.indigo,
           accentColor: Colors.deepOrange,
           fontFamily: 'Lato',
+          textTheme: TextTheme(
+            titleSmall: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+            ),
+            titleMedium: TextStyle(
+              color: Colors.grey,
+              fontSize: 18,
+            ),
+            titleLarge: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+            ),
+          ),
         ),
         home: ProductsOverviewScreen(),
         routes: {
           ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
-          CartScreen.routeName:(context) => CartScreen(),
+          CartScreen.routeName: (context) => CartScreen(),
         },
       ),
     );

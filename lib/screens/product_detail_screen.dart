@@ -17,11 +17,44 @@ class ProductDetailScreen extends StatelessWidget {
         as String; //GETS THE ID OF PRODUCT FROM ROUTE ARGUMENTS
     final loadedProduct = Provider.of<Products>(
       context,
-      listen: false,    //DO NOT REBUILD ON CHANGES, DEACTIVATE LISTENER
+      listen: false, //DO NOT REBUILD ON CHANGES, DEACTIVATE LISTENER
     ).findById(productId); //GETS THE SPECIFIC PRODUCT
     return Scaffold(
       appBar: AppBar(
         title: Text(loadedProduct.title),
+      ),
+      body: Scrollbar(
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: 300,
+                width: double.infinity,
+                child: Image.network(
+                  loadedProduct.imageUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                '€${loadedProduct.price}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                width: double.infinity,
+                child: Text(
+                  loadedProduct.description,
+                  style: Theme.of(context).textTheme.titleSmall,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
