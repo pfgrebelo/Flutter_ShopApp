@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart.dart';
-import '../providers/product.dart';
 
 class CartItem extends StatelessWidget {
   final String id;
@@ -21,32 +20,48 @@ class CartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final cart = Provider.of<Cart>(context, listen: false);
     return Dismissible(
       //CREATES A SWIPE EFFECT TO DISMISS THE CARD
       key: ValueKey(id),
       background: Container(
         //BACKGROUND FOR WHATS SHOWN BEHIND
         color: Theme.of(context).errorColor,
-        child: Icon(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.symmetric(
+          vertical: 5,
+          horizontal: 15,
+        ),
+        child: const Icon(
           Icons.delete,
           color: Colors.white,
           size: 40,
         ),
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: 20),
-        margin: EdgeInsets.symmetric(
-          vertical: 5,
-          horizontal: 15,
-        ),
       ),
       direction: DismissDirection.endToStart, //DIRECTION OF DISMISSIBLE SWIPE
+      confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Are you sure?'),
+            content: const Text('Do you want to remove the item from the cart?'),
+            actions: [
+              TextButton(onPressed: () {
+                Navigator.of(context).pop(false);
+              }, child: const Text('No'),),
+              TextButton(onPressed: () {
+                Navigator.of(context).pop(true);
+              }, child: const Text('Yes'),),
+            ],
+          ),
+        );
+      },
       onDismissed: (direction) {
         //WHAT IT DOES WHEN ITS DISMISSED
         Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
       child: Card(
-        margin: EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(
           vertical: 5,
           horizontal: 15,
         ),
@@ -65,11 +80,12 @@ class CartItem extends StatelessWidget {
               title,
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            subtitle: Text('Total: €${(price * quantity)}'),
+            subtitle: Text('Total: €${(price * quantity).toStringAsFixed(2)}'),
             trailing: Column(
               children: [
-                GestureDetector(    //ADD A SINGLE ITEM TO CART
-                  child: Text(
+                GestureDetector(
+                  //ADD A SINGLE ITEM TO CART
+                  child: const Text(
                     '+',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -79,8 +95,9 @@ class CartItem extends StatelessWidget {
                   },
                 ),
                 Text('$quantity x'),
-                GestureDetector(      //REMOVE SINGLE ITEM FROM CART
-                  child: Text(
+                GestureDetector(
+                  //REMOVE SINGLE ITEM FROM CART
+                  child: const Text(
                     '-',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
