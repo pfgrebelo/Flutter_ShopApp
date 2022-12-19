@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart.dart';
+import '../providers/product.dart';
 
 class CartItem extends StatelessWidget {
   final String id;
@@ -20,9 +21,12 @@ class CartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(   //CREATES A SWIPE EFFECT TO DISMISS THE CARD
+    //final cart = Provider.of<Cart>(context, listen: false);
+    return Dismissible(
+      //CREATES A SWIPE EFFECT TO DISMISS THE CARD
       key: ValueKey(id),
-      background: Container(      //BACKGROUND FOR WHATS SHOWN BEHIND 
+      background: Container(
+        //BACKGROUND FOR WHATS SHOWN BEHIND
         color: Theme.of(context).errorColor,
         child: Icon(
           Icons.delete,
@@ -36,8 +40,9 @@ class CartItem extends StatelessWidget {
           horizontal: 15,
         ),
       ),
-      direction: DismissDirection.endToStart,   //DIRECTION OF DISMISSIBLE SWIPE
-      onDismissed: (direction) {                //WHAT IT DOES WHEN ITS DISMISSED
+      direction: DismissDirection.endToStart, //DIRECTION OF DISMISSIBLE SWIPE
+      onDismissed: (direction) {
+        //WHAT IT DOES WHEN ITS DISMISSED
         Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
       child: Card(
@@ -56,9 +61,36 @@ class CartItem extends StatelessWidget {
                 ),
               ),
             ),
-            title: Text(title, style: Theme.of(context).textTheme.titleLarge,),
+            title: Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             subtitle: Text('Total: €${(price * quantity)}'),
-            trailing: Text('$quantity x'),
+            trailing: Column(
+              children: [
+                GestureDetector(    //ADD A SINGLE ITEM TO CART
+                  child: Text(
+                    '+',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () {
+                    Provider.of<Cart>(context, listen: false)
+                        .addSingleItem(productId);
+                  },
+                ),
+                Text('$quantity x'),
+                GestureDetector(      //REMOVE SINGLE ITEM FROM CART
+                  child: Text(
+                    '-',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () {
+                    Provider.of<Cart>(context, listen: false)
+                        .removeSingleItem(productId);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

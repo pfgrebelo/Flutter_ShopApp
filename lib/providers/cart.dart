@@ -83,6 +83,18 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
+  void addSingleItem(String productId) {
+    _items.update(
+        productId,
+        (existingCartItem) => CartItem(
+              id: existingCartItem.id,
+              title: existingCartItem.title,
+              quantity: existingCartItem.quantity + 1,
+              price: existingCartItem.price,
+            ));
+    notifyListeners();
+  }
+
   void clear() {
     _items = {};
     notifyListeners();
