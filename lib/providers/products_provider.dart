@@ -7,7 +7,7 @@ import './product.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items = [
-    Product(
+    /* Product(
       id: 'p1',
       title: 'Red Shirt',
       description: 'A red shirt - it is pretty red!',
@@ -38,7 +38,7 @@ class Products with ChangeNotifier {
       price: 49.99,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+    ), */
   ];
   //var _showFavoritesOnly = false;   //FILTERS GLOBALLY
 
@@ -69,25 +69,51 @@ class Products with ChangeNotifier {
     notifyListeners();
   } */
 
+  Future<void> fetchAndSetProducts() async {
+    final url = Uri.parse(
+        'https://flutter-shop-c0e34-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+    try{
+    final response = await http.get(url);
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    final List<Product> loadedProducts = [];
+    extractedData.forEach((key, value) {
+      loadedProducts.add(Product(
+        id: key,
+        title: value['title'],
+        description: value['description'],
+        price: value['price'],
+        isFavorite: value['isFavorite'],
+        imageUrl: value['imageUrl'],
+        ));
+    },); 
+    _items = loadedProducts;
+    notifyListeners();
+    //print(json.decode(response.body));
+    }catch (error){
+      throw (error);
+    }
+  }
+
   Future<void> addProduct(Product product) async {
     final url = Uri.parse(
         'https://flutter-shop-c0e34-default-rtdb.europe-west1.firebasedatabase.app/products.json');
-    return http
-        .post(
-      url,
-      body: json.encode({
-        //ADDS A PRODUCT IN FIREBASE REALTIME_DB
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((response) {
-          print(json.decode(response.body));  //GOT IN CONSOLE {name: -NJjTHuY7SCafFSOaD7A}
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          //ADDS A PRODUCT IN FIREBASE REALTIME_DB
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        }),
+      );
+      print(json
+          .decode(response.body)); //GOT IN CONSOLE {name: -NJjTHuY7SCafFSOaD7A}
       final newProduct = Product(
-          id: json.decode(response.body)['name'],   //ADDS THE AUTO_ID FROM FIREBASE
+          id: json
+              .decode(response.body)['name'], //ADDS THE AUTO_ID FROM FIREBASE
           title: product.title,
           description: product.description,
           price: product.price,
@@ -95,7 +121,10 @@ class Products with ChangeNotifier {
       _items.add(newProduct);
       //_items.insert(0, newProduct); //AT THE START OF THE LIST
       notifyListeners(); //FROM 'with ChangeNotifier' SENDS INFO TO LISTENERS
-    });
+    } catch (error) {
+      print(error);
+      throw error;
+    }
   }
 
   void updateProduct(String id, Product newProduct) {
