@@ -24,12 +24,44 @@ class _EditProductScreenState extends State<EditProductScreen> {
     price: 0,
     imageUrl: '',
   );
+  var _initValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': '',
+  };
+
+  var _isInit = true;
 
   @override
   void initState() {
     _imageUrlFocusNode
         .addListener(_updateImageUrl); //UPDATE IMAGE URL ON CHANGE FOCUS
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      //GETS THE ARGUMENTS FROM USER_PRODUCT_ITEM TO EDIT, ONLY ON THE 1ST RUN IF IT WAS OPENED WITH THE EDIT BUTTON
+      //final productId = ModalRoute.of(context)!.settings.arguments as String;                 //ERROR: type 'Null' is not a subtype of type 'String' in type cast
+      final productId = ModalRoute != null ? ModalRoute.of(context)!.settings.arguments : '';   //SOLUTION FOR: type 'Null' is not a subtype of type 'String' in type cast
+      if (productId != null) {
+        _editedProduct = Provider.of<Products>(context, listen: false)
+            .findById(productId.toString()); //GETS THE DATA FROM THE PRODUCT TO EDIT
+        _initValues = {
+          'title': _editedProduct.title,
+          'description': _editedProduct.description,
+          'price': _editedProduct.price.toString(),
+          //'imageUrl': _editedProduct.imageUrl,
+          'imageUrl': '',
+        };
+        _imageUrlController.text = _editedProduct
+            .imageUrl; //WITH A CONTROLLER WE CANT ASSIGN INIT_VALUE DIRECTLY, NEED TO ASSIGN TO THE CONTROLLER.TEXT
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
   }
 
   @override
@@ -61,8 +93,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!isValid) {
       return;
     }
-    _form.currentState?.save();
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    _form.currentState!.save();
+    if (_editedProduct.id.isNotEmpty) {
+      Provider.of<Products>(context, listen: false).updateProduct(_editedProduct.id,_editedProduct);
+    } else {
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
     Navigator.of(context).pop();
   }
 
@@ -86,6 +122,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             //FOR LONGER LISTS, INSTEAD OF LISTVIEW, USE A Column (combined with SingleChildScrollView)
             children: [
               TextFormField(
+                initialValue: _initValues['title'],
                 decoration: InputDecoration(labelText: 'Title'),
                 textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.sentences,
@@ -102,10 +139,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     description: _editedProduct.description,
                     price: _editedProduct.price,
                     imageUrl: _editedProduct.imageUrl,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
               ),
               TextFormField(
+                initialValue: _initValues['price'],
                 decoration: InputDecoration(labelText: 'Price'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
@@ -128,10 +167,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     description: _editedProduct.description,
                     price: double.parse(newValue.toString()),
                     imageUrl: _editedProduct.imageUrl,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
               ),
               TextFormField(
+                initialValue: _initValues['description'],
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 textCapitalization: TextCapitalization.sentences,
@@ -152,6 +193,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     description: newValue.toString(),
                     price: _editedProduct.price,
                     imageUrl: _editedProduct.imageUrl,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
               ),
@@ -212,6 +254,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           description: _editedProduct.description,
                           price: _editedProduct.price,
                           imageUrl: newValue.toString(),
+                          isFavorite: _editedProduct.isFavorite,
                         );
                       },
                     ),
