@@ -17,6 +17,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<Products>(context, listen: false);
     return ListTile(
       title: Text(
         title,
@@ -61,7 +62,7 @@ class UserProductItem extends StatelessWidget {
                 ),
               );
               if (result) {
-                Provider.of<Products>(context, listen: false).deleteProduct(id);
+                provider.deleteProduct(id);
               }
             },
             icon: const Icon(Icons.delete),

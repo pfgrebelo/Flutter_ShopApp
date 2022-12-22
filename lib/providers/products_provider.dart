@@ -72,24 +72,26 @@ class Products with ChangeNotifier {
   Future<void> fetchAndSetProducts() async {
     final url = Uri.parse(
         'https://flutter-shop-c0e34-default-rtdb.europe-west1.firebasedatabase.app/products.json');
-    try{
-    final response = await http.get(url);
-    final extractedData = json.decode(response.body) as Map<String, dynamic>;
-    final List<Product> loadedProducts = [];
-    extractedData.forEach((key, value) {
-      loadedProducts.add(Product(
-        id: key,
-        title: value['title'],
-        description: value['description'],
-        price: value['price'],
-        isFavorite: value['isFavorite'],
-        imageUrl: value['imageUrl'],
-        ));
-    },); 
-    _items = loadedProducts;
-    notifyListeners();
-    //print(json.decode(response.body));
-    }catch (error){
+    try {
+      final response = await http.get(url);
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedData.forEach(
+        (key, value) {
+          loadedProducts.add(Product(
+            id: key,
+            title: value['title'],
+            description: value['description'],
+            price: value['price'],
+            isFavorite: value['isFavorite'],
+            imageUrl: value['imageUrl'],
+          ));
+        },
+      );
+      _items = loadedProducts;
+      notifyListeners();
+      //print(json.decode(response.body));
+    } catch (error) {
       throw (error);
     }
   }
@@ -127,9 +129,20 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
+    //UPDATES PRODUCT ON FIREBASE
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final url = Uri.parse(
+          'https://flutter-shop-c0e34-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+      http.patch(url,
+          body: json.encode({
+            //UPDATES A PRODUCT IN FIREBASE REALTIME_DB
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+          }));
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {
@@ -137,8 +150,28 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+  /* void updateProduct(String id, Product newProduct) {   //UPDATES PRODUCT LOCALLY
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if (prodIndex >= 0) {
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  } */
+
+  void deleteProduct(String id) {     //DELETES ON DB
+    final url = Uri.parse(
+        'https://flutter-shop-c0e34-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    final existingProduct = _items[existingProductIndex];
+    _items.removeAt(existingProductIndex);
+    http.delete(url);
     notifyListeners();
   }
+
+  /* void deleteProduct(String id) {   //DELETES LOCALLY
+    _items.removeWhere((prod) => prod.id == id);
+    notifyListeners();
+  } */
 }
