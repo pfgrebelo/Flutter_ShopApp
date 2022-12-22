@@ -76,6 +76,9 @@ class Products with ChangeNotifier {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+      if (extractedData == null) {
+        return;
+      }
       extractedData.forEach(
         (key, value) {
           loadedProducts.add(Product(
@@ -160,7 +163,8 @@ class Products with ChangeNotifier {
     }
   } */
 
-  void deleteProduct(String id) {     //DELETES ON DB
+  void deleteProduct(String id) {
+    //DELETES ON DB
     final url = Uri.parse(
         'https://flutter-shop-c0e34-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
