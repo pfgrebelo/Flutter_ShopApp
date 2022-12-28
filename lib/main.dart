@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 import './screens/products_overview_screen.dart';
 import './screens/product_detail_screen.dart';
 import './screens/cart_screen.dart';
+import './providers/auth.dart';
 import './providers/products_provider.dart';
 import './providers/cart.dart';
 import './providers/orders.dart';
 import './screens/orders_screen.dart';
 import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
+import './screens/auth_screen.dart';
 
 main() => runApp(const MyApp());
 
@@ -20,6 +22,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       //TO ADD MULTI PROVIDERS
       providers: [
+        ChangeNotifierProvider(
+          create: (context) => Auth(),
+        ),
         ChangeNotifierProvider(
           //.value(...INSTEAD OF CONSTRUCTOR, CREATE(ctx)=>Products(), CAN USE VALUE IN CASE OF SINGLE ITEM OF GRIDS OR LISTS
           //value: Products(),
@@ -54,7 +59,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: ProductsOverviewScreen(),
+        home: AuthScreen(),
         routes: {
           ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
           CartScreen.routeName: (context) => CartScreen(),
