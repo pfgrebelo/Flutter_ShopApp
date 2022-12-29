@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatelessWidget {
   /* final String id;
@@ -22,6 +23,7 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     //final product = Provider.of<Product>(context);  //GETS THE SPECIFIC PRODUCT
     final cart = Provider.of<Cart>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
     return Consumer<Product>(
       //WIDGET CONSUMER TO REPLACE PROVIDER.OF
       builder: (context, product, child) => ClipRRect(
@@ -54,7 +56,7 @@ class ProductItem extends StatelessWidget {
                       .favorite_border), //CHECKS IF ISFAVORITE IS TOGGLED TO USE DIFERENT ICONS ON EACH CASES
               onPressed: () {
                 product
-                    .toggleFavoriteStatus(); //USES FUNCTION FROM PRODUCT.PROVIDER
+                    .toggleFavoriteStatus(authData.token!, authData.userId); //USES FUNCTION FROM PRODUCT.PROVIDER
               },
               color: Theme.of(context).colorScheme.secondary,
             ),

@@ -25,48 +25,54 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => Auth(),
         ),
-        ChangeNotifierProvider(
+        ChangeNotifierProxyProvider<Auth, Products>(
           //.value(...INSTEAD OF CONSTRUCTOR, CREATE(ctx)=>Products(), CAN USE VALUE IN CASE OF SINGLE ITEM OF GRIDS OR LISTS
           //value: Products(),
-          create: (context) => Products(), //WIDGET FROM PROVIDER PACKAGE
+          create: (context) => Products('','', []),
+          update: (context, auth, previous) => Products(
+              auth.token!, auth.userId, previous == null ? [] : previous.items),
         ),
         ChangeNotifierProvider(
-          create: (context) => Cart(),
+          create: (context) => Cart(), //WIDGET FROM PROVIDER PACKAGE
         ),
-        ChangeNotifierProvider(
-          create: (context) => Orders(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          create: (context) => Orders('', []),
+          update: (context, auth, previous) => Orders(
+              auth.token!, previous == null ? [] : previous.orders),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'My Shop',
-        theme: ThemeData(
-          primarySwatch: Colors.indigo,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
-          textTheme: TextTheme(
-            titleSmall: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-            ),
-            titleMedium: TextStyle(
-              color: Colors.grey,
-              fontSize: 18,
-            ),
-            titleLarge: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
+      child: Consumer<Auth>(
+        builder: (context, auth, _) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'My Shop',
+          theme: ThemeData(
+            primarySwatch: Colors.indigo,
+            accentColor: Colors.deepOrange,
+            fontFamily: 'Lato',
+            textTheme: TextTheme(
+              titleSmall: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              ),
+              titleMedium: TextStyle(
+                color: Colors.grey,
+                fontSize: 18,
+              ),
+              titleLarge: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
             ),
           ),
+          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          routes: {
+            ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
+            CartScreen.routeName: (context) => CartScreen(),
+            OrdersScreen.routeName: (context) => OrdersScreen(),
+            UserProductsScreen.routeName: (context) => UserProductsScreen(),
+            EditProductScreen.routeName: (context) => EditProductScreen(),
+          },
         ),
-        home: AuthScreen(),
-        routes: {
-          ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
-          CartScreen.routeName: (context) => CartScreen(),
-          OrdersScreen.routeName: (context) => OrdersScreen(),
-          UserProductsScreen.routeName: (context) => UserProductsScreen(),
-          EditProductScreen.routeName: (context) => EditProductScreen(),
-        },
       ),
     );
   }
