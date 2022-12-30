@@ -11,6 +11,7 @@ import './screens/orders_screen.dart';
 import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/auth_screen.dart';
+import './screens/splash_screen.dart';
 
 main() => runApp(const MyApp());
 
@@ -28,17 +29,17 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, Products>(
           //.value(...INSTEAD OF CONSTRUCTOR, CREATE(ctx)=>Products(), CAN USE VALUE IN CASE OF SINGLE ITEM OF GRIDS OR LISTS
           //value: Products(),
-          create: (context) => Products('','', []),
-          update: (context, auth, previous) => Products(
-              auth.token.toString(), auth.userId.toString(), previous == null ? [] : previous.items),
+          create: (context) => Products('', '', []),
+          update: (context, auth, previous) => Products(auth.token.toString(),
+              auth.userId.toString(), previous == null ? [] : previous.items),
         ),
         ChangeNotifierProvider(
           create: (context) => Cart(), //WIDGET FROM PROVIDER PACKAGE
         ),
         ChangeNotifierProxyProvider<Auth, Orders>(
-          create: (context) => Orders('','', []),
-          update: (context, auth, previous) => Orders(
-              auth.token.toString(), auth.userId.toString(), previous == null ? [] : previous.orders),
+          create: (context) => Orders('', '', []),
+          update: (context, auth, previous) => Orders(auth.token.toString(),
+              auth.userId.toString(), previous == null ? [] : previous.orders),
         ),
       ],
       child: Consumer<Auth>(
@@ -64,7 +65,15 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),    //CHECKS HOMESCREEN IF AUTHENTICATED
+          home: auth.isAuth
+              ? ProductsOverviewScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (context, snapshot) =>
+                      snapshot.connectionState == ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
+                ), //CHECKS HOMESCREEN IF AUTHENTICATED
           routes: {
             ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
             CartScreen.routeName: (context) => CartScreen(),
