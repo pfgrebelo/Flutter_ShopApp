@@ -56,7 +56,7 @@ class ProductItem extends StatelessWidget {
                       .favorite_border), //CHECKS IF ISFAVORITE IS TOGGLED TO USE DIFERENT ICONS ON EACH CASES
               onPressed: () {
                 product
-                    .toggleFavoriteStatus(authData.token!, authData.userId); //USES FUNCTION FROM PRODUCT.PROVIDER
+                    .toggleFavoriteStatus(authData.token!, authData.userId!); //USES FUNCTION FROM PRODUCT.PROVIDER
               },
               color: Theme.of(context).colorScheme.secondary,
             ),

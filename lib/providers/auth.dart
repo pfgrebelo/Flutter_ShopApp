@@ -21,8 +21,8 @@ class Auth with ChangeNotifier {
     return null;
   }
 
-  String get userId {
-    return _userId!;
+  String? get userId {
+    return _userId;
   }
 
   Future<void> signup(String email, String password) async {
@@ -90,4 +90,12 @@ class Auth with ChangeNotifier {
       throw error;
     }
   }
+
+  void logout() {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+    notifyListeners();
+  }
+
 }

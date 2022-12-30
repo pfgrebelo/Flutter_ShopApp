@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           //value: Products(),
           create: (context) => Products('','', []),
           update: (context, auth, previous) => Products(
-              auth.token!, auth.userId, previous == null ? [] : previous.items),
+              auth.token.toString(), auth.userId.toString(), previous == null ? [] : previous.items),
         ),
         ChangeNotifierProvider(
           create: (context) => Cart(), //WIDGET FROM PROVIDER PACKAGE
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, Orders>(
           create: (context) => Orders('','', []),
           update: (context, auth, previous) => Orders(
-              auth.token!, auth.userId, previous == null ? [] : previous.orders),
+              auth.token.toString(), auth.userId.toString(), previous == null ? [] : previous.orders),
         ),
       ],
       child: Consumer<Auth>(
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),    //CHECKS HOMESCREEN IF AUTHENTICATED
           routes: {
             ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
             CartScreen.routeName: (context) => CartScreen(),
