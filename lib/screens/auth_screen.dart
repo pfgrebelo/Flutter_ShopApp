@@ -103,7 +103,9 @@ class _AuthCardState extends State<AuthCard>
   var _isLoading = false;
   final _passwordController = TextEditingController();
   late AnimationController _controller; //VARIABLES FOF ANIMATIONS
-  late Animation<Size> _heightAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double>
+      _opacityAnimation; //FOR TEXTFORMFILED CONFIRM PW ANIMATION
 
   @override
   void initState() {
@@ -114,14 +116,20 @@ class _AuthCardState extends State<AuthCard>
         milliseconds: 300,
       ),
     );
-    _heightAnimation = Tween<Size>(
+    _slideAnimation = Tween<Offset>(
             //INITIATES THE ANIMATIONS VARIABLES
-            begin: Size(double.infinity, 290),
-            end: Size(double.infinity, 352))
+            begin: Offset(0, -1.5),
+            end: Offset(0, 0))
         .animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.fastOutSlowIn,
+      ),
+    );
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
       ),
     );
     /* _heightAnimation.addListener(() {   //ADDED LISTENER FOR SETSTATE, MANUALLY ANIMATIONS
@@ -225,12 +233,13 @@ class _AuthCardState extends State<AuthCard>
       child: AnimatedContainer(
         duration: Duration(milliseconds: 400),
         curve: Curves.easeIn,
-          height: _authMode == AuthMode.Signup ? 352 : 290,
-          //height: _heightAnimation.value.height, //LINK THE ANIMATION
-          constraints: BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 352 : 290),
-          width: deviceSize.width * 0.75,
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
+        height: _authMode == AuthMode.Signup ? 352 : 290,
+        //height: _heightAnimation.value.height, //LINK THE ANIMATION
+        constraints:
+            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 352 : 290),
+        width: deviceSize.width * 0.75,
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
@@ -261,20 +270,34 @@ class _AuthCardState extends State<AuthCard>
                     _authData['password'] = value!;
                   },
                 ),
-                if (_authMode == AuthMode.Signup)
-                  TextFormField(
-                    enabled: _authMode == AuthMode.Signup,
-                    decoration:
-                        const InputDecoration(labelText: 'Confirm Password'),
-                    obscureText: true,
-                    validator: _authMode == AuthMode.Signup
-                        ? (value) {
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            }
-                          }
-                        : null,
+                //if (_authMode == AuthMode.Signup)   //THIS IF INSTANT SHOWS THE TEXTFIELD WHEN THE CONDITION IS MET, BUT ADDED FadeTransition WIDGET FOR ANIMATION
+                AnimatedContainer(
+                  constraints: BoxConstraints(
+                    minHeight: _authMode == AuthMode.Signup ? 60 : 0,
+                    maxHeight: _authMode == AuthMode.Signup ? 90 : 0,
                   ),
+                  duration: Duration(milliseconds: 400),
+                  curve: Curves.easeIn,
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: TextFormField(
+                        enabled: _authMode == AuthMode.Signup,
+                        decoration: const InputDecoration(
+                            labelText: 'Confirm Password'),
+                        obscureText: true,
+                        validator: _authMode == AuthMode.Signup
+                            ? (value) {
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match!';
+                                }
+                              }
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(
                   height: 20,
                 ),
