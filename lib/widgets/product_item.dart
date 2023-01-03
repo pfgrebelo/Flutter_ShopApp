@@ -87,10 +87,13 @@ class ProductItem extends StatelessWidget {
                 arguments: product.id, //PASS ID AS ARGUMENT TO ACCESS DATA
               );
             },
-            child: FadeInImage(
-              placeholder: AssetImage('assets/images/product-placeholder.png'),
-              image: NetworkImage(product.imageUrl),
-              fit: BoxFit.cover,
+            child: Hero(    //Hero() ANIMATE IMAGE INTO NEW PAGE, ON PRODUCT DETAIL SCREEN
+              tag: product.id,
+              child: FadeInImage(
+                placeholder: AssetImage('assets/images/product-placeholder.png'),
+                image: NetworkImage(product.imageUrl),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
