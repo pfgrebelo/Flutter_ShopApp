@@ -30,19 +30,6 @@ class ProductItem extends StatelessWidget {
         //CHANGES BORDER OF IT'S CHILD
         borderRadius: BorderRadius.circular(15),
         child: GridTile(
-          child: GestureDetector(
-            //ADDS ONTAP TO IMAGE
-            onTap: () {
-              Navigator.of(context).pushNamed(
-                ProductDetailScreen.routeName,
-                arguments: product.id, //PASS ID AS ARGUMENT TO ACCESS DATA
-              );
-            },
-            child: Image.network(
-              product.imageUrl,
-              fit: BoxFit.cover,
-            ),
-          ),
           header: GridTileBar(
             backgroundColor: Colors.black54,
             title: Text(
@@ -55,8 +42,8 @@ class ProductItem extends StatelessWidget {
                   : Icons
                       .favorite_border), //CHECKS IF ISFAVORITE IS TOGGLED TO USE DIFERENT ICONS ON EACH CASES
               onPressed: () {
-                product
-                    .toggleFavoriteStatus(authData.token!, authData.userId!); //USES FUNCTION FROM PRODUCT.PROVIDER
+                product.toggleFavoriteStatus(authData.token!,
+                    authData.userId!); //USES FUNCTION FROM PRODUCT.PROVIDER
               },
               color: Theme.of(context).colorScheme.secondary,
             ),
@@ -71,18 +58,39 @@ class ProductItem extends StatelessWidget {
               icon: Icon(Icons.shopping_cart),
               onPressed: () {
                 cart.addItem(product.id, product.price, product.title);
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();    //IF THERE IS AN ACTIVE SNACKBAR TOAST, IT HIDES TO SHOW THE NEW ONE
-                ScaffoldMessenger.of(context).showSnackBar(    //REACHS THE NEAREST SCAFFOLD
-                  SnackBar(     //ADDS A TOAST BAR BELLOW THE SCAFFOLD
+                ScaffoldMessenger.of(context)
+                    .hideCurrentSnackBar(); //IF THERE IS AN ACTIVE SNACKBAR TOAST, IT HIDES TO SHOW THE NEW ONE
+                ScaffoldMessenger.of(context).showSnackBar(
+                  //REACHS THE NEAREST SCAFFOLD
+                  SnackBar(
+                    //ADDS A TOAST BAR BELLOW THE SCAFFOLD
                     content: Text('Added item to cart'),
                     duration: Duration(seconds: 2),
-                    action: SnackBarAction(label: 'UNDO', onPressed: () {   //REMOVES THE LATEST ITEM ADDED
-                      cart.removeSingleItem(product.id);    
-                    } ,),
+                    action: SnackBarAction(
+                      label: 'UNDO',
+                      onPressed: () {
+                        //REMOVES THE LATEST ITEM ADDED
+                        cart.removeSingleItem(product.id);
+                      },
+                    ),
                   ),
                 );
               },
               color: Theme.of(context).colorScheme.secondary,
+            ),
+          ),
+          child: GestureDetector(
+            //ADDS ONTAP TO IMAGE
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                ProductDetailScreen.routeName,
+                arguments: product.id, //PASS ID AS ARGUMENT TO ACCESS DATA
+              );
+            },
+            child: FadeInImage(
+              placeholder: AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
             ),
           ),
         ),
