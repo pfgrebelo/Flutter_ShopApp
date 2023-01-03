@@ -92,7 +92,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
   final Map<String, String> _authData = {
@@ -101,6 +102,39 @@ class _AuthCardState extends State<AuthCard> {
   };
   var _isLoading = false;
   final _passwordController = TextEditingController();
+  late AnimationController _controller; //VARIABLES FOF ANIMATIONS
+  late Animation<Size> _heightAnimation;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      //ADDED with SingleTickerProviderStateMixin TO CLASS FOR VSYNC, LETS THE WIDGET KNOW WHEN A FRAME UPDATE IS DUE
+      vsync: this,
+      duration: Duration(
+        milliseconds: 300,
+      ),
+    );
+    _heightAnimation = Tween<Size>(
+            //INITIATES THE ANIMATIONS VARIABLES
+            begin: Size(double.infinity, 290),
+            end: Size(double.infinity, 352))
+        .animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.fastOutSlowIn,
+      ),
+    );
+    /* _heightAnimation.addListener(() {   //ADDED LISTENER FOR SETSTATE, MANUALLY ANIMATIONS
+      setState(() {});
+    }); */
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose(); //CLEANS THE LISTENER
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -142,7 +176,8 @@ class _AuthCardState extends State<AuthCard> {
           _authData['password']!,
         );
       }
-    } on HttpException catch (error) {                    //ERROR HANDLING ON SIGNUP/ON
+    } on HttpException catch (error) {
+      //ERROR HANDLING ON SIGNUP/ON
       var errorMessage = 'Authentication failed.';
       if (error.toString().contains('EMAIL_EXISTS')) {
         errorMessage = 'This email address is already in use.';
@@ -170,10 +205,12 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _authMode = AuthMode.Signup;
       });
+      _controller.forward(); //STARTS THE ANIMATION
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
+      _controller.reverse();
     }
   }
 
@@ -185,13 +222,15 @@ class _AuthCardState extends State<AuthCard> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        height: _authMode == AuthMode.Signup ? 352 : 290,
-        constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
-        width: deviceSize.width * 0.75,
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 400),
+        curve: Curves.easeIn,
+          height: _authMode == AuthMode.Signup ? 352 : 290,
+          //height: _heightAnimation.value.height, //LINK THE ANIMATION
+          constraints: BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 352 : 290),
+          width: deviceSize.width * 0.75,
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
